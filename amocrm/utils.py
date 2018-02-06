@@ -24,6 +24,17 @@ class lazy_property(object):
 
 class lazy_dict_property(object):
 
+    """
+    lazy_dict_property, который можно перезагрузить
+
+    class A():
+        @lazy_dict_property
+        def prop(self):
+            ...
+
+    A().__recalculate_prop
+    """
+
     def __init__(self, calculate_function):
         self.__delegate()
         self.fake = empty()
@@ -44,8 +55,14 @@ class lazy_dict_property(object):
     def __dispatch(name):
         def __wrapper(*args, **kwargs):
             this = args[0]
-            value = this._calculate(this._obj)
-            setattr(this._obj, this._calculate.__name__, value)
+
+            def recalculate():
+                value = this._calculate(this._obj)
+                setattr(this._obj, this._calculate.__name__, value)
+                return value
+
+            value = recalculate()
+            setattr(this._obj, '__reload_'+this._calculate.__name__, recalculate)
             return getattr(value, name)(*args[1:], **kwargs)
         return __wrapper
 
