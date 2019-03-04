@@ -21,7 +21,7 @@ __all__ = []
 _AMO_LOGIN_PATH = '/private/api/auth.php?type=json'
 _REQUEST_PARAMS = {
     'headers': {'User-Agent': 'Amocrm API module. Python powered'},
-    'timeout': 10,
+    'timeout': 30,
 }
 _G, _P = 'get', 'post'
 
