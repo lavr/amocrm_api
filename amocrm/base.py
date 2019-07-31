@@ -82,7 +82,7 @@ class _BaseAmoManager(six.with_metaclass(ABCMeta)):
 
     def auth(self):
         try:
-            self._make_request(_AMO_LOGIN_PATH, _P, data=self._login_data)
+            self._make_request(_AMO_LOGIN_PATH, _P, data={}, params=self._login_data)
         except AmoResponseException as e:
             raise AmoAuthException(e.resp)
 
@@ -166,16 +166,16 @@ class _BaseAmoManager(six.with_metaclass(ABCMeta)):
     def pipelines(self):
         return {item['name']: item for item in self.account_info.get('pipelines').values()}
 
-    def _make_request(self, path, method, data, headers=None):
+    def _make_request(self, path, method, data=None, headers=None, params=None):
         headers = headers or {}
 
         _req_params = copy(_REQUEST_PARAMS)
         headers.update(_req_params.pop('headers'))
 
         method = method.lower()
-        params = {}
+        params = copy(params or {})
         if method != _P:
-            params.update(data)
+            params.update(data or {})
             data = None
             for name, value in params.items():
                 if isinstance(value, (list, tuple)):
