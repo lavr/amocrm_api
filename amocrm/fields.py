@@ -311,18 +311,20 @@ class EnumCustomField(CustomField):
             if self.custom_field not in instance.objects._custom_fields:
                 raise ValueError(u"%s have not custom field '%s'" % (instance.objects.name, self.custom_field))
             custom_field_info = instance.objects._custom_fields[self.custom_field]
-            _id = custom_field_info['id']
+            _id = int(custom_field_info['id'])
             _data = [item['values'] for item in _data if item['id'] == _id]
 
             _data = _data[-1] if _data else None
+            if _data is None:
+                return
+
             enum = {enum_name: _id for _id, enum_name in custom_field_info.get('enums', {}).items()}.get(self.enum)
             if not enum:
                 raise ValueError(u"%s have not custom field '%s' with enum %s" % (instance.objects.name,
                                                                                   self.custom_field,
                                                                                   self.enum))
+            enum = int(enum)
 
-            if _data is None:
-                return
             _data = [item for item in _data if item.get('enum') == enum]
             self._check_field(instance)
             instance._fields_data[self.field] = [item['value'] for item in _data] if _data else None
